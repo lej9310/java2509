@@ -1,4 +1,4 @@
-package ch02.sec01;
+package ch02.sec09;
 
 public class OperationPromotionExample {
 
