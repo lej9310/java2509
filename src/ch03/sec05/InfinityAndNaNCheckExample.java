@@ -12,6 +12,7 @@ public class InfinityAndNaNCheckExample {
 		double z = x / y;
 		// 잘못된 코드
 		// double z = x%y
+		
 		System.out.println(z + 2);
 
 		// 알맞은 코드
