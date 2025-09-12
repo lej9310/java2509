@@ -21,6 +21,7 @@ public class BasicClass {
 		 * st1.introduce(); st1.study(); System.out.println("\n"); st2.introduce();
 		 * st2.study();
 		 */
+		
 
 		// 예제2. ====================================
 		// 객체 생성과 초기화
