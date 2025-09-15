@@ -1,0 +1,51 @@
+package ch08.sec05;
+
+public class Television implements RemoteControl {
+
+	// 필드 선언
+	private int volume;
+
+	// turnOn() 추상 메소드 오버라이딩
+	@Override
+	public void turnOn() {
+		System.out.println("TV를 켭니다.");
+	}
+
+	// turnOff() 추상 메소드 오버라이딩
+	@Override
+	public void turnOff() {
+		System.out.println("TV를 끕니다.");
+	}
+
+	// setVolume() 추상 메소드 오버라이딩
+	@Override
+	public void setVolume(int volume) {
+		if (volume > RemoteControl.MAX_VOLUME) {
+			this.volume = RemoteControl.MAX_VOLUME;
+		} else if (volume < RemoteControl.MIN_VOLUME) {
+			this.volume = RemoteControl.MIN_VOLUME;
+		} else {
+			this.volume = volume;
+		}
+
+		System.out.println("현재 TV 볼륨 : " + volume);
+	}
+
+	// 추가 필드 선언
+	private int memoryVolume;
+
+	// setMute 메소드 오버라이딩
+	@Override
+	public void setMute(boolean mute) {
+		if (mute) {
+			// mute=True일 경우
+			this.memoryVolume = this.volume;
+			System.out.println("무음 처리합니다.");
+			setVolume(RemoteControl.MIN_VOLUME);
+		} else {
+			// mute=false일 경우, 원래 volume으로 복원
+			System.out.println("무음 해제합니다.");
+			setVolume(this.memoryVolume);
+		}
+	}
+}
