@@ -1,4 +1,4 @@
-package com.lej;
+package com.lej.conn;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,19 +16,15 @@ public class DBConnection {
 
 	public static Connection getConnection() {
 		Connection conn = null;
-
 		try {
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
 			System.out.println("MariaDB 연결 성공!");
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("MariaDB 연결 실패: ");
 		}
-
 		return conn;
 	}
-	
 
 	public static void close(Statement stmt, Connection conn) {
 		if (stmt != null) {
@@ -38,7 +34,6 @@ public class DBConnection {
 				e.printStackTrace();
 			}
 		}
-
 		if (conn != null) {
 			try {
 				conn.close();
@@ -46,6 +41,39 @@ public class DBConnection {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static void close(ResultSet rs, PreparedStatement pstmt) {
+		if (rs != null) {
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if (pstmt != null) {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void close(PreparedStatement pstmt, Connection conn) {
+		try {
+			if (pstmt != null)
+				pstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (conn != null)
+				conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void close(ResultSet rs, PreparedStatement pstmt, Connection conn) {
@@ -56,7 +84,6 @@ public class DBConnection {
 				e.printStackTrace();
 			}
 		}
-
 		if (pstmt != null) {
 			try {
 				pstmt.close();
@@ -64,7 +91,6 @@ public class DBConnection {
 				e.printStackTrace();
 			}
 		}
-
 		if (conn != null) {
 			try {
 				conn.close();
@@ -72,7 +98,6 @@ public class DBConnection {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 }
