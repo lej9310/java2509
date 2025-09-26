@@ -18,7 +18,7 @@ public class DBConnection {
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(URL, USER, PASSWORD);
-			System.out.println("MariaDB 연결 성공!");
+			//System.out.println("MariaDB 연결 성공!");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("MariaDB 연결 실패: ");
