@@ -40,89 +40,67 @@ public class CRUDClass {
 
 		// Ex8. Add Column in Table =================
 		// addColUsers("city");
-		// addColUsers("country");		
+		// addColUsers("country");
 
 		// Ex9. Drop Column in Table =================
 		// dropColUsers("city");
 		// dropColUsers("country");
-		// dropColUsers("b");
-		 
+
 		selectUsers();
 	}
 
 	// Ex9. Drop Column in Table ===================================================
 	private void dropColUsers(String colName) {
 		System.out.println("========= users 테이블에 열 삭제 [시작] =========");
-		
-		String dropColSql = "ALTER TABLE users DROP COLUMN IF EXISTS" + colName;
-		Connection conn = null;
-		PreparedStatement pstmt = null;
 
-		try {
-			conn = DBConnection.getConnection();
-			pstmt = conn.prepareStatement(dropColSql);
-			ResultSet rs = pstmt.executeQuery(dropColSql); // 컬럼 존재 여부 확인
-			rs.next();
-			int count = rs.getInt(1);
-			String str;		
-			
-			if (count > 0) {
-				str = "users 테이블에 삭제할 열이 없습니다. 작업을 중지합니다.";
-			} else {
-				// 없으면 생성
-				pstmt.execute(dropColSql);
-				str = "*** 삭제된 컬럼명: " + colName + " ***";
+		String checkColSql = "SHOW COLUMNS FROM users LIKE ?";
+		String dropColSql = "ALTER TABLE users DROP COLUMN `" + colName + "`";
+
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement checkStmt = conn.prepareStatement(checkColSql);) {
+
+			checkStmt.setString(1, colName);
+			try (ResultSet rs = checkStmt.executeQuery();) {
+				if (!rs.next()) { // 컬럼이 존재하지 않음
+					System.out.println("users 테이블에 삭제할 열 " + colName + "이 없습니다. 작업을 중지합니다.");
+					return;
+				}
+			}
+			try (PreparedStatement dropStmt = conn.prepareStatement(dropColSql)) {
+				dropStmt.executeUpdate();
+				System.out.println("*** 삭제된 컬럼명: " + colName + " ***");
 				System.out.println("========= users 테이블에 열 삭제 [완료] =========");
-			}			
+			}
 		} catch (SQLException e) {
 			e.printStackTrace(); // 디버깅용
-		} finally {
-			DBConnection.close(pstmt, conn);
 		}
-	}	
+	}
 
 	// Ex8. Add Column in Table ===================================================
 	private void addColUsers(String colName) {
 		System.out.println("========= users 테이블에 열 추가 [시작] =========");
 
-		// 열 이름 유효성 검사
-		if (!isValidColumnName(colName)) {
-			System.out.println("*** 잘못된 열 이름입니다. 작업을 중지합니다.***");
-			return;
-		}
+		String checkColSql = "SHOW COLUMNS FROM users LIKE ?";
+		String addColSql = "ALTER TABLE users ADD COLUMN `" + colName + "`" + " VARCHAR(50)";
 
-		String addColSql = "ALTER TABLE users ADD COLUMN " + colName + " VARCHAR(50)";
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement checkStmt = conn.prepareStatement(checkColSql)) {
 
-		try {
-			conn = DBConnection.getConnection();
-			pstmt = conn.prepareStatement(addColSql);
-			pstmt.executeUpdate(); // 실행 후 영향을 받은 행의 수를 반환
-
-			// 성공적으로 추가됨
-			System.out.println("*** 추가된 컬럼명: " + colName + " ***");
-			System.out.println("========= users 테이블에 열 추가 [완료] =========");
-		} catch (SQLException e) {
-			// 데이터베이스 에러 코드, MySQL에서는 컬럼이 이미 존재할 경우 1060
-			if (e.getErrorCode() == 1060) {
-				System.out.println("users 테이블에 해당 열이 이미 존재합니다. 작업을 중지합니다.");
-			} else {
-				System.out.println("users 테이블에 열 추가 작업이 중단되었습니다.");
-				System.out.println("오류 내용: " + e.getMessage());
+			checkStmt.setString(1, colName);
+			try (ResultSet rs = checkStmt.executeQuery()) {
+				if (rs.next()) {
+					System.out.println("users 테이블에 삭제할 열 " + colName + "이 이미 존재합니다. 작업을 중지합니다.");
+					return;
+				}
 			}
-		} finally {
-			DBConnection.close(pstmt, conn);
+			try (PreparedStatement addStmt = conn.prepareStatement(addColSql)) {
+				addStmt.executeUpdate();
+				System.out.println("*** 추가된 컬럼명: " + colName + " ***");
+				System.out.println("========= users 테이블에 열 추가 [완료] =========");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-	}
-
-	// 컬렴명 유효성 검증 메소드 추가 - protected 접근 제어자:같은 패키지 내/이 클래스의 하위 클래스에서만 접근 가능
-	protected boolean isValidColumnName(String colName) {
-		if (colName == null || colName.trim().isEmpty() || colName.contains("`") || colName.contains("'")
-				|| colName.contains("\"") || colName.contains(" ")) {
-			return false;
-		}
-		return true;
 	}
 
 	// Ex7. Drop Table ==========================================================
